@@ -3,43 +3,73 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Gra Impostor - Runda</title>
+    <title>Gra Impostor - Gra</title>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
 
 <body>
     <h1>Gra</h1>
-    <div>
-        Twój nick: <span id="myNick"></span>
-    </div>
+    <div>Twój nick: <span id="myNick"></span></div>
+    <div>Hasło: <span id="password"></span></div>
 
     <div>
-        <input id="hintInput" placeholder="Wpisz słowo-podpowiedź">
+        <input id="hintInput" placeholder="Wpisz podpowiedź">
         <button onclick="sendHint()">Wyślij</button>
     </div>
 
-    <h2>Podpowiedzi:</h2>
-    <ul id="hintsList"></ul>
+    <h2>Chat</h2>
+    <ul id="chat"></ul>
+
+    <div>
+        <input id="guessInput" placeholder="Zgadnij hasło (impostor)">
+        <button onclick="guessPassword()">Zgadnij</button>
+    </div>
 
     <script>
         const socket = io();
         const nick = localStorage.getItem("nick");
+        const code = localStorage.getItem("lobbyCode");
         document.getElementById("myNick").innerText = nick;
 
-        socket.emit("join", nick);
+        // Dołącz do lobby w grze
+        socket.emit("joinLobby", { nick, code });
 
         function sendHint() {
-            const word = document.getElementById("hintInput").value;
-            if (!word) return;
-            socket.emit("hint", { from: nick, word });
+            const hint = document.getElementById("hintInput").value;
+            if (!hint) return;
+            socket.emit("sendHint", { code, hint });
             document.getElementById("hintInput").value = "";
         }
 
-        socket.on("hint", ({ from, word }) => {
-            const ul = document.getElementById("hintsList");
-            const li = document.createElement("li");
-            li.textContent = `${from}: ${word}`;
-            ul.appendChild(li);
+        socket.on("chatUpdate", (chat) => {
+            const ul = document.getElementById("chat");
+            ul.innerHTML = "";
+            chat.forEach(c => {
+                const li = document.createElement("li");
+                li.textContent = `${c.nick}: ${c.hint}`;
+                ul.appendChild(li);
+            });
+        });
+
+        function guessPassword() {
+            const guess = document.getElementById("guessInput").value;
+            if (!guess) return;
+            socket.emit("guessPassword", { code, guess });
+            document.getElementById("guessInput").value = "";
+        }
+
+        socket.on("gameStarted", (data) => {
+            const me = data.players[socket.id];
+            if (me.isImpostor) {
+                document.getElementById("password").innerText = "Jesteś impostorem!";
+            } else {
+                document.getElementById("password").innerText = data.password;
+            }
+        });
+
+        socket.on("gameOver", (data) => {
+            alert("Koniec gry! Zwycięzca: " + data.winner + "\nPowód: " + data.reason);
+            window.location.href = "lobby.html";
         });
     </script>
 </body>

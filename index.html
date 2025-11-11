@@ -9,15 +9,44 @@
 
 <body>
     <h1>Gra Impostor</h1>
-    <input id="nick" placeholder="Twój nick">
-    <button onclick="joinLobby()">Dołącz do gry</button>
+    <div>
+        Nick: <input id="nick">
+    </div>
+    <div>
+        <button onclick="createLobby()">Stwórz lobby</button>
+    </div>
+    <div>
+        Kod lobby: <input id="lobbyCode">
+        <button onclick="joinLobby()">Dołącz do lobby</button>
+    </div>
+    <div>
+        Impostor ma podpowiedź: <input type="checkbox" id="impostorMode">
+    </div>
 
     <script>
-        function joinLobby() {
-            const nick = document.getElementById('nick').value;
+        const socket = io();
+
+        function createLobby() {
+            const nick = document.getElementById("nick").value;
             if (!nick) return alert("Wpisz nick");
-            localStorage.setItem("nick", nick); // zachowaj nick
-            window.location.href = "lobby.html"; // przejście do lobby
+            const impostorMode = document.getElementById("impostorMode").checked;
+            socket.emit("createLobby", { nick, impostorMode });
+        }
+
+        socket.on("lobbyCreated", (code) => {
+            localStorage.setItem("lobbyCode", code);
+            localStorage.setItem("nick", document.getElementById("nick").value);
+            window.location.href = "lobby.html";
+        });
+
+        function joinLobby() {
+            const nick = document.getElementById("nick").value;
+            const code = document.getElementById("lobbyCode").value;
+            if (!nick || !code) return alert("Nick i kod lobby są wymagane");
+            socket.emit("joinLobby", { nick, code });
+            localStorage.setItem("lobbyCode", code);
+            localStorage.setItem("nick", nick);
+            window.location.href = "lobby.html";
         }
     </script>
 </body>

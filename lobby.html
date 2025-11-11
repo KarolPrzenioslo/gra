@@ -9,38 +9,52 @@
 
 <body>
     <h1>Lobby</h1>
+    <div>Kod lobby: <span id="code"></span></div>
     <div>
-        Twój nick: <span id="myNick"></span>
-    </div>
-    <div>
-        Gracze w lobby:
+        Gracze:
         <ul id="playersList"></ul>
     </div>
-    <button onclick="startGame()">Rozpocznij grę</button>
+    <div>
+        <label>
+            Gotowy <input type="checkbox" id="ready" onchange="setReady(this.checked)">
+        </label>
+    </div>
+    <div>
+        Hasło (tylko host): <input id="password">
+        <button onclick="startGame()">Start</button>
+    </div>
 
     <script>
         const socket = io();
         const nick = localStorage.getItem("nick");
-        document.getElementById("myNick").innerText = nick;
+        const code = localStorage.getItem("lobbyCode");
+        document.getElementById("code").innerText = code;
 
-        // dołącz gracza
-        socket.emit("join", nick);
-
-        // aktualizacja listy graczy
-        socket.on("players", (list) => {
+        socket.on("playersUpdate", (players) => {
             const ul = document.getElementById("playersList");
             ul.innerHTML = "";
-            list.forEach(p => {
+            players.forEach(p => {
                 const li = document.createElement("li");
-                li.textContent = p.nickname;
+                li.textContent = p.nick + (p.ready ? " ✅" : "");
                 ul.appendChild(li);
             });
         });
 
-        function startGame() {
-            // tylko prosty redirect – w prawdziwej grze sprawdzasz hosta
-            window.location.href = "game.html";
+        function setReady(ready) {
+            socket.emit("setReady", { code, ready });
         }
+
+        function startGame() {
+            const password = document.getElementById("password").value;
+            if (!password) return alert("Hasło wymagane");
+            socket.emit("startGame", { code, password });
+        }
+
+        socket.on("gameStarted", (data) => {
+            window.location.href = "game.html";
+        });
+
+        socket.on("errorMsg", (msg) => alert(msg));
     </script>
 </body>
 
