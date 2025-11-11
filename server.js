@@ -10,11 +10,24 @@ const io = new Server(server, { cors: { origin: "*" } });
 // serwowanie frontendu
 app.use(express.static(path.join(__dirname)));
 
-// Socket.IO
+// stan gry w pamięci
+let players = {};
+
 io.on("connection", (socket) => {
     console.log("Nowy gracz:", socket.id);
-    socket.on("join", (nick) => {
-        console.log(nick, "dołączył");
+
+    socket.on("join", (nickname) => {
+        players[socket.id] = { nickname };
+        io.emit("players", Object.values(players));
+    });
+
+    socket.on("hint", ({ from, word }) => {
+        io.emit("hint", { from, word });
+    });
+
+    socket.on("disconnect", () => {
+        delete players[socket.id];
+        io.emit("players", Object.values(players));
     });
 });
 

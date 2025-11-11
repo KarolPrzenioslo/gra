@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Gra Impostor - Runda</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+
+<body>
+    <h1>Gra</h1>
+    <div>
+        Twój nick: <span id="myNick"></span>
+    </div>
+
+    <div>
+        <input id="hintInput" placeholder="Wpisz słowo-podpowiedź">
+        <button onclick="sendHint()">Wyślij</button>
+    </div>
+
+    <h2>Podpowiedzi:</h2>
+    <ul id="hintsList"></ul>
+
+    <script>
+        const socket = io();
+        const nick = localStorage.getItem("nick");
+        document.getElementById("myNick").innerText = nick;
+
+        socket.emit("join", nick);
+
+        function sendHint() {
+            const word = document.getElementById("hintInput").value;
+            if (!word) return;
+            socket.emit("hint", { from: nick, word });
+            document.getElementById("hintInput").value = "";
+        }
+
+        socket.on("hint", ({ from, word }) => {
+            const ul = document.getElementById("hintsList");
+            const li = document.createElement("li");
+            li.textContent = `${from}: ${word}`;
+            ul.appendChild(li);
+        });
+    </script>
+</body>
+
+</html>

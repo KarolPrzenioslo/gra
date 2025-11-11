@@ -3,30 +3,22 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Gra Impostor</title>
-    <!-- Socket.IO CDN -->
+    <title>Gra Impostor - Start</title>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
 
 <body>
     <h1>Gra Impostor</h1>
     <input id="nick" placeholder="Twój nick">
-    <button onclick="join()">Dołącz</button>
-    <div id="players"></div>
+    <button onclick="joinLobby()">Dołącz do gry</button>
 
     <script>
-        // Łączenie z tym samym serwerem
-        const socket = io();
-
-        function join() {
+        function joinLobby() {
             const nick = document.getElementById('nick').value;
-            socket.emit('join', nick);
+            if (!nick) return alert("Wpisz nick");
+            localStorage.setItem("nick", nick); // zachowaj nick
+            window.location.href = "lobby.html"; // przejście do lobby
         }
-
-        socket.on('players', (list) => {
-            document.getElementById('players').innerText =
-                'Gracze: ' + list.map(p => p.nickname).join(', ');
-        });
     </script>
 </body>
 

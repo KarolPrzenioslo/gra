@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Gra Impostor - Lobby</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+
+<body>
+    <h1>Lobby</h1>
+    <div>
+        Twój nick: <span id="myNick"></span>
+    </div>
+    <div>
+        Gracze w lobby:
+        <ul id="playersList"></ul>
+    </div>
+    <button onclick="startGame()">Rozpocznij grę</button>
+
+    <script>
+        const socket = io();
+        const nick = localStorage.getItem("nick");
+        document.getElementById("myNick").innerText = nick;
+
+        // dołącz gracza
+        socket.emit("join", nick);
+
+        // aktualizacja listy graczy
+        socket.on("players", (list) => {
+            const ul = document.getElementById("playersList");
+            ul.innerHTML = "";
+            list.forEach(p => {
+                const li = document.createElement("li");
+                li.textContent = p.nickname;
+                ul.appendChild(li);
+            });
+        });
+
+        function startGame() {
+            // tylko prosty redirect – w prawdziwej grze sprawdzasz hosta
+            window.location.href = "game.html";
+        }
+    </script>
+</body>
+
+</html>
