@@ -60,7 +60,7 @@
 
         socket.on("gameStarted", (data) => {
             const me = data.players[socket.id];
-            if (me.isImpostor) {
+            if (me && me.isImpostor) {
                 document.getElementById("password").innerText = "Jesteś impostorem!";
             } else {
                 document.getElementById("password").innerText = data.password;

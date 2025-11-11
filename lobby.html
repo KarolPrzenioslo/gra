@@ -47,8 +47,10 @@
         function startGame() {
             const password = document.getElementById("password").value;
             if (!password) return alert("Hasło wymagane");
+            // emitujemy start z kodem lobby i hasłem
             socket.emit("startGame", { code, password });
         }
+
 
         socket.on("gameStarted", (data) => {
             window.location.href = "game.html";

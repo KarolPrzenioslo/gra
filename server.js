@@ -73,8 +73,11 @@ io.on("connection", (socket) => {
         lobby.turnOrder = shuffle(ids);
         lobby.round = 1;
         lobby.started = true;
+
+        // emitujemy do wszystkich w lobby
         io.to(code).emit("gameStarted", { password, impostorId, players: lobby.players });
     });
+
 
     // Podpowiedzi / ruch
     socket.on("sendHint", ({ code, hint }) => {
