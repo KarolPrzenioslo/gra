@@ -11,7 +11,6 @@ const io = new Server(server, {
     cors: { origin: "*" }
 });
 
-app.get("/", (req, res) => res.send("Serwer działa ✅"));
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server działa na porcie ${PORT}`));
