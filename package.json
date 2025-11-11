@@ -1,5 +1,5 @@
 {
-    "name": "gra-impostor",
+    "name": "gra",
     "version": "1.0.0",
     "main": "server.js",
     "scripts": {
