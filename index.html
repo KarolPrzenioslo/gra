@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Gra Impostor</title>
+    <!-- CDN Socket.IO -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+
+<body>
+    <input id="nick" placeholder="Twój nick">
+    <button onclick="join()">Dołącz</button>
+    <div id="players"></div>
+
+    <script>
+        const socket = io(); // teraz io() działa, bo CDN już załadowany
+        function join() {
+            const nick = document.getElementById('nick').value;
+            socket.emit('join', nick);
+        }
+
+        socket.on('players', (list) => {
+            document.getElementById('players').innerText =
+                'Gracze: ' + list.map(p => p.nickname).join(', ');
+        });
+    </script>
+</body>
+
+</html>
