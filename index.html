@@ -4,17 +4,20 @@
 <head>
     <meta charset="utf-8">
     <title>Gra Impostor</title>
-    <!-- CDN Socket.IO -->
+    <!-- Socket.IO CDN -->
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
 
 <body>
+    <h1>Gra Impostor</h1>
     <input id="nick" placeholder="Twój nick">
     <button onclick="join()">Dołącz</button>
     <div id="players"></div>
 
     <script>
-        const socket = io(); // teraz io() działa, bo CDN już załadowany
+        // Łączenie z tym samym serwerem
+        const socket = io();
+
         function join() {
             const nick = document.getElementById('nick').value;
             socket.emit('join', nick);
